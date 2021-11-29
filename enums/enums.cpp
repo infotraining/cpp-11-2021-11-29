@@ -34,11 +34,21 @@ enum class Country : uint8_t
     pl = 1, us, fr, gb, it
 };
 
-std::vector<std::string> country_names = { "Poland", "United States" };
+template <typename EnumClass>
+struct UseEnumAsIndex : std::false_type
+{};
 
-const std::string& get_country(const std::vector<std::string>& dict, Country country)
+template <>
+struct UseEnumAsIndex<Country> : std::true_type
+{};
+
+template <typename EnumClass, typename IndexType = size_t, typename = std::enable_if_t<UseEnumAsIndex<Country>::value>>
+constexpr IndexType as_index(EnumClass enum_value)
 {
-    return dict.at(static_cast<std::underlying_type_t<Country>>(country));
+    static_assert(sizeof(IndexType) >= sizeof(std::underlying_type_t<EnumClass>), 
+        "Size of IndexType must be at least equal to size of underlying type in enum");
+
+    return static_cast<IndexType>(enum_value);
 }
 
 TEST_CASE("enum class")
@@ -52,6 +62,12 @@ TEST_CASE("enum class")
 
     c1 = static_cast<Country>(3);
     REQUIRE(c1 == Country::fr);
+
+    std::vector<std::string> country_names = { "Poland", "United States" };
+
+    REQUIRE(country_names[as_index(Country::pl)] == "Poland"s);
+
+    static_assert(as_index(Country::pl) == 1, "Error");
 }
 
 TEST_CASE("enum class in C++17")
