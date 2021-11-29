@@ -1,0 +1,4 @@
+D:/infotraining/code/cpp-11/code/_training_scaffolding/auto-decltype/out/build/x64-Debug/CMakeFiles/auto-decltype.dir
+D:/infotraining/code/cpp-11/code/_training_scaffolding/auto-decltype/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
+D:/infotraining/code/cpp-11/code/_training_scaffolding/auto-decltype/out/build/x64-Debug/CMakeFiles/test.dir
+D:/infotraining/code/cpp-11/code/_training_scaffolding/auto-decltype/out/build/x64-Debug/CMakeFiles/edit_cache.dir
