@@ -76,7 +76,13 @@ namespace ModernCpp
         {
         }
 
-        //...
+        UniquePtr(const UniquePtr&) = delete;
+        UniquePtr& operator=(const UniquePtr&) = delete;
+
+        UniquePtr(UniquePtr&& other) : ptr_{other.ptr_}
+        {
+            other.ptr_ = nullptr;
+        }
 
         ~UniquePtr()
         {
