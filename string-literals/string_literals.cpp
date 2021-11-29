@@ -61,13 +61,17 @@ Money operator""_USD(long double value)
     return Money{value, Currency::usd};
 }
 
+Money operator""_EUR(long double value)
+{
+    return Money{value, Currency::eur};
+}
+
 
 TEST_CASE("user defined literal")
 {
-    auto price = 100.99_USD;
+    auto price1 = 100.99_USD;
+    auto price2 = 100.99_EUR;
 
     REQUIRE(price.currency == Currency::usd);
     REQUIRE(price.value == Approx(100.99));
-
-
 }
