@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
+#include <array>
 
 using namespace std;
 using namespace Catch::Matchers;
@@ -136,5 +138,88 @@ TEST_CASE("declaring variables with auto")
         //auto ax5{10, 11, 12}; // !!! ERROR - since C++17
         auto ax6 = {1, 2, 3, 4}; // std::initializer_list<int>
     }
+}
 
+struct Argument
+{
+    int value;
+private:
+    Argument(int v) : value{v}
+    {}
+};
+
+int foo(Argument arg)
+{
+    return 42;
+}
+
+TEST_CASE("decltype")
+{
+    std::map<int, std::string> dict = { { 1, "one"}, {2, "two"} };
+
+    auto backup = dict;
+    REQUIRE(backup.size() == 2);
+
+    decltype(dict) other; 
+    REQUIRE(other.size() == 0);
+
+    using EntryType = decltype(dict)::value_type;
+
+    std::vector<decltype(dict)::mapped_type> items;
+
+    dict[3];
+    REQUIRE(dict.size() == 3);
+
+    using RefMappedValue = decltype(dict[1]);
+    REQUIRE(dict.size() == 3);
+
+    using ReturnType = decltype(foo(std::declval<Argument>()));
+}
+
+template <typename T1, typename T2>
+auto my_multiply(T1 a, T2 b)
+{
+    return a * b;
+}
+
+template<size_t N>
+auto create_buffer()
+{
+    if constexpr(N <= 100)
+        return std::array<int, N>{};
+    else    
+        return std::vector<int>(N);
+}
+
+TEST_CASE("using auto in return type for function")
+{
+    auto result1 = my_multiply(1, 3.14);    
+
+    auto small_buffer = create_buffer<64>();
+    auto large_buffer = create_buffer<1024>();
+}
+
+class Dictionary
+{
+    std::map<int, std::string> items = { {1, "one"}, {2, "two"} };
+public:
+    auto get_by_value(int key) // int get_by_value(int key)
+    {
+        return items[key];
+    }
+
+    decltype(auto) get(int key) // int& get(int key)
+    {
+        return items[key];
+    }
+};
+
+
+TEST_CASE("decltype(auto) vs. auto")
+{
+    Dictionary dict;
+
+    REQUIRE(dict.get(1) == "one"s);
+    dict.get(1) = "jeden"s;
+    REQUIRE(dict.get(1) == "jeden"s);
 }
