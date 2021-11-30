@@ -211,11 +211,25 @@ public:
         return items[key];
     }
 
+    auto& get_by_ref(int key) // int get_by_value(int key)
+    {
+        return items[key];
+    }
+
     decltype(auto) get(int key) // int& get(int key)
     {
         return items[key];
     }
 };
+
+template <typename T>
+decltype(auto) get_nth(std::vector<T>& vec, size_t nth)
+{
+    //decltype(auto) nth_item = vec[nth];
+    //return nth_item;
+
+    return vec[nth];
+}
 
 TEST_CASE("decltype(auto) vs. auto")
 {
@@ -224,4 +238,12 @@ TEST_CASE("decltype(auto) vs. auto")
     REQUIRE(dict.get(1) == "one"s);
     dict.get(1) = "jeden"s;
     REQUIRE(dict.get(1) == "jeden"s);
+
+    std::vector<int> vec_ints = {1, 2, 3};
+    get_nth(vec_ints, 1) = 10;
+    REQUIRE(vec_ints[1] == 10);
+
+    std::vector<bool> vec_bools = { 0, 1, 0, 1 };
+    get_nth(vec_bools, 1) = false;
+    REQUIRE(vec_bools[1] == false);
 }
