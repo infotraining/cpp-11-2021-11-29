@@ -9,17 +9,17 @@ class UniquePtr
     T* ptr_;
 
 public:
-    UniquePtr(nullptr_t)
+    UniquePtr(nullptr_t) noexcept
         : ptr_ {nullptr}
     {
     }
 
-    UniquePtr()
+    UniquePtr() noexcept
         : ptr_ {nullptr}
     {
     }
 
-    explicit UniquePtr(T* ptr)
+    explicit UniquePtr(T* ptr) noexcept
         : ptr_ {ptr}
     {
     }
@@ -28,14 +28,14 @@ public:
     UniquePtr& operator=(const UniquePtr&) = delete;
 
     // move constructor
-    UniquePtr(UniquePtr&& other)
+    UniquePtr(UniquePtr&& other) noexcept
         : ptr_ {other.ptr_}
     {
         other.ptr_ = nullptr;
     }
 
     // move assignment
-    UniquePtr& operator=(UniquePtr&& other)
+    UniquePtr& operator=(UniquePtr&& other) noexcept
     {
         if (this != &other)
         {
@@ -48,7 +48,7 @@ public:
         return *this;
     }
 
-    ~UniquePtr()
+    ~UniquePtr() noexcept
     {
         delete ptr_;
     }

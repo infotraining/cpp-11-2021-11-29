@@ -46,7 +46,7 @@ public:
 
     /////////////////////////////////////////////////
     // move constructor
-    Data(Data&& other)
+    Data(Data&& other) noexcept
         : name_ {std::move(other.name_)}
         , data_ {other.data_}
         , size_ {other.size_}
@@ -72,7 +72,7 @@ public:
         return *this;
     }
 
-    ~Data()
+    ~Data() noexcept
     {
         delete[] data_;
     }
@@ -84,22 +84,22 @@ public:
         std::swap(size_, other.size_);
     }
 
-    iterator begin()
+    iterator begin() noexcept
     {
         return data_;
     }
 
-    iterator end()
+    iterator end() noexcept
     {
         return data_ + size_;
     }
 
-    const_iterator begin() const
+    const_iterator begin() const noexcept
     {
         return data_;
     }
 
-    const_iterator end() const
+    const_iterator end() const noexcept
     {
         return data_ + size_;
     }
@@ -204,7 +204,7 @@ namespace RuleOfFive
         Data row1;
         Data row2;
 
-        ~DataRows() { std::cout << "Object has been destroyed!\n"; }
+        ~DataRows() { std::cout << "Object has been destroyed!\n"; } // if we need destructor we need also five other special functions
         DataRows(const DataRows&) = default;
         DataRows(DataRows&&) = default;
         DataRows& operator=(const DataRows&) = default;
@@ -228,4 +228,26 @@ TEST_CASE("DataRows")
     std::cout << "\n-------------\n";
     DataRows rows {Data {"row1", {1, 2, 3}}, Data {"row2", {6, 7, 8}}};
     DataRows target_rows {std::move(rows)};
+}
+
+int foo(int x) noexcept
+{
+    std::vector<int> vec;
+    return vec.at(10); // will cause std::terminate()
+}
+
+TEST_CASE("noexcept")
+{
+    std::cout << "\n--------------------noexcept\n";
+
+    std::vector<Data> vec;
+
+    vec.push_back(Data{"ds1", {1, 2, 3}});
+    std::cout << "---\n";
+    vec.push_back(Data{"ds2", {1, 2, 3}});
+    std::cout << "---\n";
+    vec.push_back(Data{"ds3", {1, 2, 3}});
+    std::cout << "---\n";
+    vec.push_back(Data{"ds4", {1, 2, 3}});
+    std::cout << "---\n";
 }
