@@ -34,7 +34,7 @@ TEST_CASE("reference binding")
 
         REQUIRE(ref_full_name == "pan kowalski"s);
 
-        //std::string&& ref_name = name;
+        //std::string&& ref_name = name; // ERROR - illegal in C++11
     }
 }
 
@@ -70,8 +70,7 @@ namespace Explain
 
     template <>
     class Vector<bool>
-    {
-        
+    {        
     public:
         struct reference
         {
@@ -102,7 +101,4 @@ TEST_CASE("using vector")
     vec.push_back(str + str);
     vec.push_back("another text");
     vec.push_back(std::move(str));
-
-    std::vector<bool> pain = {0, 1};
-    pain[0] = 1;
 }

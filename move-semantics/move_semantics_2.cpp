@@ -10,15 +10,17 @@ class UniquePtr
 
 public:
     UniquePtr(nullptr_t)
-        : ptr_{nullptr}
+        : ptr_ {nullptr}
     {
     }
 
-    UniquePtr() : ptr_{nullptr}
-    {}
+    UniquePtr()
+        : ptr_ {nullptr}
+    {
+    }
 
     explicit UniquePtr(T* ptr)
-        : ptr_{ptr}
+        : ptr_ {ptr}
     {
     }
 
@@ -26,10 +28,11 @@ public:
     UniquePtr& operator=(const UniquePtr&) = delete;
 
     // move constructor
-    UniquePtr(UniquePtr&& other) : ptr_{other.ptr_}
+    UniquePtr(UniquePtr&& other)
+        : ptr_ {other.ptr_}
     {
         other.ptr_ = nullptr;
-    }    
+    }
 
     // move assignment
     UniquePtr& operator=(UniquePtr&& other)
@@ -78,10 +81,10 @@ TEST_CASE("2---")
 
 UniquePtr<Gadget> create_gadget()
 {
-    static int gen_id{};
+    static int gen_id {};
 
     const int id = ++gen_id;
-    return UniquePtr<Gadget>{new Gadget{id, "Gadget-" + std::to_string(id)}};
+    return UniquePtr<Gadget> {new Gadget {id, "Gadget-" + std::to_string(id)}};
 }
 
 void use(UniquePtr<Gadget> g)
@@ -92,7 +95,7 @@ void use(UniquePtr<Gadget> g)
 
 TEST_CASE("move semantics - UniquePtr")
 {
-    UniquePtr<Gadget> pg1{new Gadget{1, "ipad"}};
+    UniquePtr<Gadget> pg1 {new Gadget {1, "ipad"}};
     pg1->use();
 
     UniquePtr<Gadget> pg2 = std::move(pg1);
@@ -110,7 +113,7 @@ TEST_CASE("move semantics - UniquePtr")
     auto my_gadget = std::move(gadgets[1]);
     gadgets.erase(gadgets.begin() + 1);
 
-    for(const auto& g : gadgets)
+    for (const auto& g : gadgets)
     {
         if (g)
             g->use();
@@ -130,15 +133,5 @@ TEST_CASE("Do not use after move")
 
     // REQUIRE(vec.size() == 0); // use after move == UB
     // REQUIRE(vec.capacity() == 0); // use after move == UB
-    REQUIRE(target == std::vector<int>{1, 2, 3, 4});
-
-    SECTION ("?")
-    {
-        std::vector<int> vec = {1, 2, 3, 4};
-        std::vector<int> target;
-
-        target.push_back(std::move(vec[1]));
-
-        REQUIRE(vec[1] == 2);
-    }
+    REQUIRE(target == std::vector<int> {1, 2, 3, 4});
 }

@@ -182,18 +182,6 @@ Data create_large_dataset()
     return ds;
 }
 
-struct DataRows
-{
-    Data row1;
-    Data row2;
-
-    // ~DataRows() { std::cout << "Object has been destroyed!\n"; }
-    // DataRow(const DataRow&) = default;
-    // DataRow(DataRow&&) = default;
-    // DataRow& operator=(const DataRow&) = default;
-    // DataRow& operator=(DataRow&&) = default;
-};
-
 TEST_CASE("Data & move semantics")
 {
     std::string ds_name = "ds1";
@@ -207,6 +195,35 @@ TEST_CASE("Data & move semantics")
 
     Data ds2 = create_large_dataset();
     print("ds2", ds2);
+}
+
+namespace RuleOfFive
+{
+    struct DataRows
+    {
+        Data row1;
+        Data row2;
+
+        ~DataRows() { std::cout << "Object has been destroyed!\n"; }
+        DataRows(const DataRows&) = default;
+        DataRows(DataRows&&) = default;
+        DataRows& operator=(const DataRows&) = default;
+        DataRows& operator=(DataRows&&) = default;
+    };
+}
+
+namespace RuleOfZero
+{
+    struct DataRows
+    {
+        Data row1;
+        Data row2;
+    };
+}
+
+TEST_CASE("DataRows")
+{
+    using namespace RuleOfZero;
 
     std::cout << "\n-------------\n";
     DataRows rows {Data {"row1", {1, 2, 3}}, Data {"row2", {6, 7, 8}}};
