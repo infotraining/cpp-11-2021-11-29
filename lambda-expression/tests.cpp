@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <tuple>
 
 using namespace std;
 using namespace Catch::Matchers;
@@ -198,10 +199,10 @@ public:
     }
 };
 
-template <typename F, typename TArg>
-decltype(auto) call(F&& f, TArg&& arg)
+template <typename F, typename... TArgs>
+decltype(auto) call(F&& f, TArgs&&... args)
 {
-    return f(std::forward<TArg>(arg));
+    return f(std::forward<TArgs>(args)...);
 }
 
 TEST_CASE("task queue")
