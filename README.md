@@ -1,5 +1,9 @@
 # Szkolenie - Programowanie w C++11 #
 
+## Ankieta 
+
+* https://forms.gle/TK6jKRSa7p8CwcJ67
+
 ## Dokumentacja + slajdy
 
 * https://infotraining.bitbucket.io/cpp-11

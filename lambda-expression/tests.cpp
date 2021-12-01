@@ -3,6 +3,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <set>
 
 using namespace std;
 using namespace Catch::Matchers;
@@ -141,6 +142,22 @@ TEST_CASE("generic lambda")
     auto p2 = std::make_unique<int>(20);
 
     REQUIRE(cmp_by_pointed_value(p1, p2) == true);
+
+    SECTION("using type of closure")
+    {
+        int z = 1;
+        std::set<int*, decltype(cmp_by_pointed_value)> set_ptrs(cmp_by_pointed_value);
+
+        set_ptrs.insert(&y);
+        set_ptrs.insert(&x);
+        set_ptrs.insert(&z);
+
+        for(const auto& ptr : set_ptrs)
+        {
+            std::cout << *ptr << " ";
+        }
+        std::cout << "\n";
+    }
 }
 
 TEST_CASE("storing closures")
