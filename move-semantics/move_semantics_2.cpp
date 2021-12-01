@@ -74,6 +74,18 @@ public:
     }
 };
 
+template <typename T, typename TArg1>
+UniquePtr<T> MakeUnique(TArg1&& arg1)
+{
+    return UniquePtr<T>(new T(std::forward<TArg1>(arg1));
+}
+
+template <typename T, typename TArg1, typename TArg2>
+UniquePtr<T> MakeUnique(TArg1&& arg1, TArg2&& arg2)
+{
+    return UniquePtr<T>(new T(std::forward<TArg1>(arg1), std::forward<TArg2>(arg2)));
+}
+
 TEST_CASE("2---")
 {
     std::cout << "\n--------------------------\n\n";
@@ -95,7 +107,7 @@ void use(UniquePtr<Gadget> g)
 
 TEST_CASE("move semantics - UniquePtr")
 {
-    UniquePtr<Gadget> pg1 {new Gadget {1, "ipad"}};
+    UniquePtr<Gadget> pg1 = MakeUnique<Gadget>(1, "ipad");
     pg1->use();
 
     UniquePtr<Gadget> pg2 = std::move(pg1);

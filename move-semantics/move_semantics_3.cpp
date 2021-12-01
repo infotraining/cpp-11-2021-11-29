@@ -1,5 +1,7 @@
 #include "catch.hpp"
+#include "gadget.hpp"
 #include <iostream>
+#include <deque>
 
 ////////////////////////////////////////////////////////////////////////////
 // Data - class with copy & move semantics (user provided implementation)
@@ -230,7 +232,7 @@ TEST_CASE("DataRows")
     DataRows target_rows {std::move(rows)};
 }
 
-int foo(int x) noexcept
+int foo(int x) noexcept // do not lie!!!
 {
     std::vector<int> vec;
     return vec.at(10); // will cause std::terminate()
@@ -242,12 +244,162 @@ TEST_CASE("noexcept")
 
     std::vector<Data> vec;
 
-    vec.push_back(Data{"ds1", {1, 2, 3}});
+    vec.push_back(Data {"ds1", {1, 2, 3}});
     std::cout << "---\n";
-    vec.push_back(Data{"ds2", {1, 2, 3}});
+    vec.push_back(Data {"ds2", {1, 2, 3}});
     std::cout << "---\n";
-    vec.push_back(Data{"ds3", {1, 2, 3}});
+    vec.push_back(Data {"ds3", {1, 2, 3}});
     std::cout << "---\n";
-    vec.push_back(Data{"ds4", {1, 2, 3}});
+    vec.push_back(Data {"ds4", {1, 2, 3}});
     std::cout << "---\n";
+}
+
+template <typename T>
+void collapse(T& item)
+{
+    puts(__PRETTY_FUNCTION__);
+}
+
+template <typename T>
+void deduce(T&& item)
+{
+    puts(__PRETTY_FUNCTION__);
+}
+
+TEST_CASE("reference collapsing")
+{
+    int x = 10;
+    int& ref_x = x;
+
+    collapse(x);
+    collapse<int&>(x);
+
+    deduce(x);
+    deduce(42);
+
+    auto&& universal_ref1 = x; // -> int&
+    auto&& universal_ref2 = 42; // ->int&&
+}
+
+////////////////////////////////////////////////////////
+///  PERFECT FORWARDING
+
+void have_fun(Gadget& g)
+{
+    puts(__PRETTY_FUNCTION__);
+    g.use();
+}
+
+void have_fun(const Gadget& cg)
+{
+    puts(__PRETTY_FUNCTION__);
+    cg.use();
+}
+
+void have_fun(Gadget&& g)
+{
+    puts(__PRETTY_FUNCTION__);
+    g.use();
+}
+
+// void use(Gadget& g)
+// {
+//     have_fun(g);
+// }
+
+// void use(const Gadget& g)
+// {
+//     have_fun(g);
+// }
+
+// void use(Gadget&& g)
+// {
+//     have_fun(std::move(g));
+// }
+
+template <typename TGadget>
+void use(TGadget&& g)
+{
+    have_fun(std::forward<TGadget>(g));
+
+    auto fwd_lambda = [](auto&& g) {
+        have_fun(std::forward<decltype(g)>(g));
+    };
+}
+
+namespace Cpp17
+{
+    template <typename TGadget>
+    void use(TGadget&& g)
+    {
+        if constexpr(std::is_reference_v<TGadget>)
+            have_fun(g);
+        else
+            have_fun(std::move(g));
+    }
+}
+
+TEST_CASE("perfect forwarding")
+{
+    Gadget g {1};
+    const Gadget cg {2};
+
+    use(g);
+    use(cg);
+    use(Gadget {3});
+}
+
+template <typename T>
+class Queue
+{
+    std::deque<T> q_;
+public:
+    Queue() = default;
+
+    void push(const T& item)
+    {
+        q_.push_front(item);
+    }
+
+    void push(T&& item)
+    {
+        q_.push_front(std::move(item));
+    }
+
+    // template <typename TItem>
+    // void push(TItem&& item)
+    // {
+    //     q_.push_front(std::forward<TItem>(item));
+    // }
+
+    template <typename TArg1, typename TArg2>
+    void emplace(TArg1&& arg1, TArg2&& arg2)
+    {
+        q_.emplace_front(std::forward<TArg1>(arg1), std::forward<TArg2>(arg2));
+    }
+
+    T& front()
+    {   
+        return q_.back();
+    }
+
+    void pop()
+    {
+        q_.pop_back();
+    }
+};
+
+TEST_CASE("Queue")
+{
+    Queue<std::string> q;
+
+    std::string str = "text";
+    
+    q.push(str);
+    q.push("temp");
+    q.push(std::string(10, 'c'));
+    q.emplace(10, 'c');
+
+    std::string s = q.front();
+    q.pop();
 }
