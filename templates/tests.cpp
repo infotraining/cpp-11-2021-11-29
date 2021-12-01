@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <numeric>
+#include <array>
 
 using namespace std;
 using namespace Catch::Matchers;
@@ -181,3 +182,52 @@ struct Person
         return std::tie(fname, lname, age) < std::tie(other.fname, other.lname, other.age);
     }
 };
+
+
+///////////////////////////
+// constexpr
+
+constexpr int factorial(int n)
+{
+    return (n == 0) ? 1 : n * factorial(n-1);
+}
+
+template <size_t N>
+constexpr std::array<size_t, N> create_factorial_lookup()
+{
+    std::array<size_t, N> results{};
+
+    for(size_t i = 0; i < N; ++i)
+        results[i] = factorial(i);
+
+    return results;
+}
+
+TEST_CASE("constexpr")
+{
+    int tab[factorial(5)] = {};
+
+    constexpr auto lookup_table = create_factorial_lookup<10>();
+
+    auto temp_table = create_factorial_lookup<15>();
+}
+
+template <typename It, typename Pred>
+constexpr auto constexpr_count_if(It first, It last, Pred pred)
+{
+    size_t count{};
+    for(; first != last; ++first)
+        if (pred(*first))
+            ++count;
+    return count;
+}
+
+TEST_CASE("constexpr algorithm")
+{
+    constexpr std::array<int, 10> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    constexpr auto no_of_evens = constexpr_count_if(begin(data), end(data), [](int x) { return x % 2 == 0; });
+
+    std::vector<int> vec = {1, 2, 3, 4};
+    const auto no_of_evens_in_vec = constexpr_count_if(begin(vec), end(vec), [](int x) { return x % 2 == 0; });
+}
